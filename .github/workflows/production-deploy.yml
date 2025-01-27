@@ -12,29 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-        env:
-          VITE_API_URL: ${{ secrets.PROD_VITE_API_URL }}
-          VITE_AUTH_TOKEN: ${{ secrets.PROD_VITE_AUTH_TOKEN }}
-
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
+      - name: Login to DigitalOcean Container Registry
+        run: doctl registry login --access-token ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t bigeq-authorize-dashboard:production .
+          docker tag bigeq-authorize-dashboard:production registry.digitalocean.com/bigeq-authorize-dashboard:production
+          docker push registry.digitalocean.com/bigeq-authorize-dashboard:production
+
       - name: Deploy to Digital Ocean App Platform
         run: |
-          # Get existing app ID or create new app
           APP_ID=$(doctl apps list --format ID --no-header --output json | jq -r '.[] | select(.spec.name == "authorize-dashboard-prod") | .id')
           if [ -z "$APP_ID" ]; then
             echo "Creating new app..."

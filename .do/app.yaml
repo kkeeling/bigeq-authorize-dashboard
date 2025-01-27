@@ -1,5 +1,6 @@
 name: authorize-dashboard-staging
 region: nyc
+
 services:
   - name: web
     image:

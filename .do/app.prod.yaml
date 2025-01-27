@@ -1,5 +1,6 @@
 name: authorize-dashboard-prod
 region: nyc
+
 services:
   - name: web
     image:

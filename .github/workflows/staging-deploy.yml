@@ -12,28 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Dependencies
-        run: bun install
-
-      - name: Build
-        run: bun run build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_AUTH_TOKEN: ${{ secrets.VITE_AUTH_TOKEN }}
-
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
+      - name: Login to DigitalOcean Container Registry
+        run: doctl registry login --access-token ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t bigeq-authorize-dashboard:staging .
+          docker tag bigeq-authorize-dashboard:staging registry.digitalocean.com/bigeq-authorize-dashboard:staging
+          docker push registry.digitalocean.com/bigeq-authorize-dashboard:staging
+
       - name: Deploy to Digital Ocean App Platform
         run: |
-          # Get existing app ID or create new app
           APP_ID=$(doctl apps list --format ID --no-header --output json | jq -r '.[] | select(.spec.name == "authorize-dashboard-staging") | .id')
           if [ -z "$APP_ID" ]; then
             echo "Creating new app..."
