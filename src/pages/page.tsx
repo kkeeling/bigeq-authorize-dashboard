@@ -5,7 +5,7 @@ export default function HomePage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    navigate("/dashboard")
+    navigate("/login")
   }, [navigate])
 
   return null
