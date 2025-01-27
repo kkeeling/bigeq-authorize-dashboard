@@ -24,8 +24,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t registry.digitalocean.com/bigeq-authorize-dashboard:staging .
-          docker push registry.digitalocean.com/bigeq-authorize-dashboard:staging
+          docker build -t registry.digitalocean.com/bigeq-authorize-dashboard/bigeq-authorize-dashboard:staging .
+          docker push registry.digitalocean.com/bigeq-authorize-dashboard/bigeq-authorize-dashboard:staging
 
       - name: Deploy to Digital Ocean App Platform
         run: |
