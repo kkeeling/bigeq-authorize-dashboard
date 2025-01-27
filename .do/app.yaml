@@ -1,12 +1,11 @@
-name: bigeq-authorize-dashboard-staging
+name: authorize-dashboard-staging
 region: nyc
 services:
   - name: web
-    dockerfile_path: Dockerfile
-    github:
-      branch: sprint-main
-      deploy_on_push: true
-      repo: kkeeling/bigeq-authorize-dashboard
+    image:
+      registry_type: DOCR
+      repository: bigeq-authorize-dashboard
+      tag: staging
     envs:
       - key: VITE_API_URL
         scope: RUN_TIME

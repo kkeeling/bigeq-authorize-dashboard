@@ -1,12 +1,11 @@
-name: bigeq-authorize-dashboard-prod
+name: authorize-dashboard-prod
 region: nyc
 services:
   - name: web
-    dockerfile_path: Dockerfile
-    github:
-      branch: main
-      deploy_on_push: true
-      repo: kkeeling/bigeq-authorize-dashboard
+    image:
+      registry_type: DOCR
+      repository: bigeq-authorize-dashboard
+      tag: production
     envs:
       - key: VITE_API_URL
         scope: RUN_TIME
