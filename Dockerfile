@@ -16,7 +16,7 @@ COPY . .
 RUN bun run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:18-slim
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
