@@ -34,7 +34,7 @@ jobs:
       - name: Deploy to Digital Ocean App Platform
         run: |
           # Get existing app ID or create new app
-          APP_ID=$(doctl apps list --format ID --no-header --output json | jq -r '.[] | select(.spec.name == "bigeq-authorize-dashboard-staging") | .id')
+          APP_ID=$(doctl apps list --format ID --no-header --output json | jq -r '.[] | select(.spec.name == "authorize-dashboard-staging") | .id')
           if [ -z "$APP_ID" ]; then
             echo "Creating new app..."
             doctl apps create --spec .do/app.yaml
