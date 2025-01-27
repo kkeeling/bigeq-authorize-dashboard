@@ -1,13 +1,11 @@
-name: bigeq-authorize-dashboard-prod
+name: authorize-dashboard-prod
 region: nyc
 services:
   - name: web
-    github:
-      branch: main
-      deploy_on_push: true
-      repo: kkeeling/bigeq-authorize-dashboard
-    build_command: npm run build
-    run_command: npm run preview
+    image:
+      registry_type: DOCR
+      repository: bigeq-authorize-dashboard
+      tag: production
     envs:
       - key: VITE_API_URL
         scope: RUN_TIME
@@ -15,6 +13,12 @@ services:
       - key: VITE_AUTH_TOKEN
         scope: RUN_TIME
         value: ${VITE_AUTH_TOKEN}
-    http_port: 4173
+    http_port: 80
     instance_count: 1
     instance_size_slug: basic-xs
+    health_check:
+      http_path: /
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
