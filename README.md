@@ -63,15 +63,43 @@ The application uses environment variables for configuration. These are managed 
 ## Project Structure
 
 ```
+├── .do/              # Digital Ocean configuration
+│   └── app.yaml      # App Platform specification
+├── .github/
+│   └── workflows/    # GitHub Actions workflows
 ├── src/
-│   ├── components/     # Reusable UI components
-│   ├── pages/          # Page components/routes
-│   ├── services/       # API and service integrations
-│   └── lib/           # Utility functions and helpers
-├── .env.example       # Example environment variables
-├── .gitignore         # Git ignore rules
+│   ├── components/   # Reusable UI components
+│   ├── pages/        # Page components/routes
+│   ├── services/     # API and service integrations
+│   └── lib/          # Utility functions and helpers
+├── .env.example      # Example environment variables
+├── .gitignore        # Git ignore rules
 └── ... configuration files
 ```
+
+## Deployment
+
+### Staging Environment
+
+The application is automatically deployed to Digital Ocean App Platform when changes are pushed to the `main` branch. The staging environment is accessible at the URL provided by Digital Ocean after deployment.
+
+#### Required Secrets for Staging Deployment
+
+The following secrets need to be configured in GitHub repository settings:
+
+- `DIGITALOCEAN_ACCESS_TOKEN`: Digital Ocean API token with app deployment permissions
+- `VITE_API_URL`: API endpoint for the staging environment
+- `VITE_AUTH_TOKEN`: Authentication token for the staging environment
+
+To set up these secrets:
+1. Go to your repository settings
+2. Navigate to Secrets and Variables > Actions
+3. Add each required secret with its corresponding value
+
+The deployment process will:
+1. Build the application with staging environment variables
+2. Deploy to Digital Ocean App Platform
+3. Make the application available at the staging URL
 
 ## Contributing
 
