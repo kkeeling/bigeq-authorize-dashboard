@@ -1,11 +1,37 @@
-import { Button } from "./components/ui/button"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import HomePage from "./pages/page"
+import DashboardPage from "./pages/dashboard/page"
+import LoginPage from "./pages/login/page"
+
+const isAuthenticated = () => {
+  return localStorage.getItem("isAuthenticated") === "true"
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />
+  }
+  return children
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-4xl font-bold mb-8">BigEQ Authorize Dashboard</h1>
-      <Button>Click me</Button>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-background">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
