@@ -1,6 +1,13 @@
 # BigEQ Authorize Dashboard
 
-A React + TypeScript dashboard application for BigEQ authorization management.
+A modern dashboard application for BigEQ authorization management built with:
+
+- React 18 + TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- shadcn/ui for UI components
+- Bun package manager support
+- Docker for containerization
 
 ## Getting Started
 
@@ -9,7 +16,8 @@ These instructions will help you set up the project for local development.
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- npm or yarn
+- Bun package manager
+- Docker (optional, for container-based development)
 
 ### Installation
 
@@ -21,9 +29,7 @@ These instructions will help you set up the project for local development.
 
 2. Install dependencies:
    ```bash
-   npm install
-   # or
-   yarn
+   bun install
    ```
 
 3. Set up environment variables:
@@ -39,9 +45,7 @@ These instructions will help you set up the project for local development.
 
 4. Start the development server:
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   bun run dev
    ```
 
 ### Environment Variables
@@ -55,59 +59,107 @@ The application uses environment variables for configuration. These are managed 
 
 ## Available Scripts
 
-- `npm run dev`: Start development server
-- `npm run build`: Build for production
-- `npm run preview`: Preview production build locally
-- `npm run lint`: Run ESLint
+- `bun run dev`: Start development server
+- `bun run build`: Build for production
+- `bun run preview`: Preview production build locally
+- `bun run lint`: Run ESLint
 
 ## Project Structure
 
 ```
-├── .do/              # Digital Ocean configuration
-│   └── app.yaml      # App Platform specification
-├── .github/
-│   └── workflows/    # GitHub Actions workflows
 ├── src/
 │   ├── components/   # Reusable UI components
-│   ├── pages/        # Page components/routes
-│   ├── services/     # API and service integrations
-│   └── lib/          # Utility functions and helpers
-├── .env.example      # Example environment variables
-├── .gitignore        # Git ignore rules
+│   │   └── ui/      # shadcn/ui components
+│   ├── pages/       # Page components/routes
+│   ├── services/    # API and service integrations
+│   └── lib/         # Utility functions and helpers
+├── .env.example     # Example environment variables
+├── Dockerfile       # Docker configuration
+├── tailwind.config.js # Tailwind CSS configuration
+├── vite.config.ts   # Vite configuration
 └── ... configuration files
 ```
 
 ## Deployment
 
-### Staging Environment
+The application can be deployed in multiple ways:
 
-The application is automatically deployed to Digital Ocean App Platform when changes are pushed to the `sprint-main` branch. The staging environment is accessible at the URL provided by Digital Ocean after deployment.
+### Docker Deployment
 
-#### Required Secrets for Staging Deployment
+1. Build the Docker image:
+   ```bash
+   docker build -t bigeq-authorize-dashboard .
+   ```
 
-The following secrets need to be configured in GitHub repository settings:
+2. Run the container:
+   ```bash
+   docker run -p 8080:80 -e VITE_API_URL=your_api_url bigeq-authorize-dashboard
+   ```
 
-- `DIGITALOCEAN_ACCESS_TOKEN`: Digital Ocean API token with app deployment permissions
-- `VITE_API_URL`: API endpoint for the staging environment
-- `VITE_AUTH_TOKEN`: Authentication token for the staging environment
+The application will be available at http://localhost:8080
 
-To set up these secrets:
-1. Go to your repository settings
-2. Navigate to Secrets and Variables > Actions
-3. Add each required secret with its corresponding value
+### Staging Environment (Digital Ocean)
 
-The deployment process will:
-1. Build the application with staging environment variables
-2. Deploy to Digital Ocean App Platform
-3. Make the application available at the staging URL
+The application is automatically deployed to Digital Ocean App Platform when changes are pushed to the `sprint-main` branch.
+
+#### Required Environment Variables
+
+Configure these in your deployment platform:
+
+- `VITE_API_URL`: API endpoint URL
+- `VITE_APP_TITLE`: Application title
+- `VITE_AUTH_TOKEN`: Authentication token (if required)
+
+#### GitHub Actions Secrets
+
+Required secrets for automated deployments:
+
+- `DIGITALOCEAN_ACCESS_TOKEN`: Digital Ocean API token
+- `DOCKER_USERNAME`: Docker Hub username (for container deployments)
+- `DOCKER_PASSWORD`: Docker Hub password
+
+### Production Deployment
+
+1. Build the production assets:
+   ```bash
+   bun run build
+   ```
+
+2. The built assets will be in the `dist` directory, ready to be served by any static file server or CDN.
+
+3. For container deployment, use the production-optimized Docker image:
+   ```bash
+   docker build --build-arg NODE_ENV=production -t bigeq-authorize-dashboard:prod .
+   ```
 
 ## Contributing
 
-1. Create a new branch for your feature
-2. Make your changes
-3. Submit a pull request
+1. Fork the repository and create your feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-Ensure you've set up your environment variables correctly before starting development.
+2. Set up your development environment:
+   - Copy `.env.example` to `.env`
+   - Install dependencies
+   - Ensure all tests pass with `bun run test`
+
+3. Make your changes:
+   - Follow the existing code style
+   - Add tests for new functionality
+   - Update documentation as needed
+
+4. Submit a pull request:
+   - Provide a clear description of the changes
+   - Link any related issues
+   - Ensure CI checks pass
+
+### Development Guidelines
+
+- Use TypeScript for all new code
+- Follow the shadcn/ui component patterns
+- Write unit tests for new features
+- Update the README for significant changes
 
 ## License
 
