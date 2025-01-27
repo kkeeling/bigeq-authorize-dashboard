@@ -81,7 +81,7 @@ The application uses environment variables for configuration. These are managed 
 
 ### Staging Environment
 
-The application is automatically deployed to Digital Ocean App Platform when changes are pushed to the `main` branch. The staging environment is accessible at the URL provided by Digital Ocean after deployment.
+The application is automatically deployed to Digital Ocean App Platform when changes are pushed to the `sprint-main` branch. The staging environment is accessible at the URL provided by Digital Ocean after deployment.
 
 #### Required Secrets for Staging Deployment
 

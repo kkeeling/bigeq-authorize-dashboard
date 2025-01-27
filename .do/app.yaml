@@ -3,7 +3,7 @@ region: nyc
 services:
   - name: web
     github:
-      branch: main
+      branch: sprint-main
       deploy_on_push: true
       repo: kkeeling/bigeq-authorize-dashboard
     build_command: npm run build
