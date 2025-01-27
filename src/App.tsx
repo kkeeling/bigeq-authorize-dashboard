@@ -1,11 +1,17 @@
-import { Button } from "./components/ui/button"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import HomePage from "./pages/page"
+import DashboardPage from "./pages/dashboard/page"
 
 function App() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-4xl font-bold mb-8">BigEQ Authorize Dashboard</h1>
-      <Button>Click me</Button>
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-background">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
