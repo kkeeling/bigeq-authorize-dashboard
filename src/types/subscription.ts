@@ -8,9 +8,9 @@ export const SubscriptionSchema = z.object({
   createTimeStampUTC: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  totalOccurrences: z.string().transform(val => parseInt(val, 10)),
-  pastOccurrences: z.string().transform(val => parseInt(val, 10)),
-  amount: z.string().transform(val => parseFloat(val))
+  totalOccurrences: z.number().int(),
+  pastOccurrences: z.number().int(),
+  amount: z.number()
 })
 
 export type Subscription = z.infer<typeof SubscriptionSchema>
