@@ -1,17 +1,46 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { useSubscriptions } from "@/hooks/useSubscriptions"
 import type { Subscription } from "@/types/subscription"
 
 export function SubscriptionsTable() {
-  const { data: subscriptions, isLoading, error } = useSubscriptions()
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPage = parseInt(searchParams.get('page') || '1', 10);
+  const initialPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+
+  const [page, setPage] = useState<number>(initialPage);
+  const [pageLimit, setPageLimit] = useState<number>(initialPageLimit);
   const [sortBy, setSortBy] = useState<keyof Subscription>("id")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+
+  const { data: subscriptionsData, isLoading, isFetching, error } = useSubscriptions(page, pageLimit)
+  const subscriptions = subscriptionsData?.data || []
+  const totalItems = subscriptionsData?.total || 0
+  const totalPages = Math.ceil(totalItems / pageLimit)
+
+  useEffect(() => {
+    setSearchParams({ page: page.toString(), page_limit: pageLimit.toString() });
+  }, [page, pageLimit, setSearchParams]);
+
+  useEffect(() => {
+    const newPage = parseInt(searchParams.get('page') || '1', 10);
+    const newPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+
+    if (page !== newPage) setPage(newPage);
+    if (pageLimit !== newPageLimit) setPageLimit(newPageLimit);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [totalPages, page]);
 
   if (isLoading) {
     return (
@@ -132,6 +161,42 @@ export function SubscriptionsTable() {
           </TableBody>
         </Table>
       </CardContent>
+      <CardFooter>
+        <div className="flex items-center justify-between w-full">
+          <Button
+            variant="outline"
+            onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            aria-label="Go to previous page"
+          >
+            Previous
+          </Button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            aria-label="Go to next page"
+          >
+            Next
+          </Button>
+          <div>
+            <label htmlFor="pageLimit" className="mr-2">Items per page:</label>
+            <select
+              id="pageLimit"
+              value={pageLimit}
+              onChange={(e) => setPageLimit(Number(e.target.value))}
+              className="border rounded p-1"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   )
 }
