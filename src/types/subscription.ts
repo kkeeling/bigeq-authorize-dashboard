@@ -14,3 +14,12 @@ export const SubscriptionSchema = z.object({
 })
 
 export type Subscription = z.infer<typeof SubscriptionSchema>
+
+export const PaginatedSubscriptionsSchema = z.object({
+  data: z.array(SubscriptionSchema),
+  total: z.number(),
+  page: z.number(),
+  page_limit: z.number(),
+});
+
+export type PaginatedSubscriptions = z.infer<typeof PaginatedSubscriptionsSchema>;
