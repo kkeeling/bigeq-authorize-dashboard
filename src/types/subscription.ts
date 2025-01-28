@@ -5,7 +5,7 @@ export const SubscriptionSchema = z.object({
   name: z.string(),
   status: z.enum(['active', 'suspended', 'cancelled']),
   customerProfileId: z.string(),
-  createTimeStampUTC: z.string().datetime(),
+  createTimeStampUTC: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   totalOccurrences: z.string().transform(val => parseInt(val, 10)),

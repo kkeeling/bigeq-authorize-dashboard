@@ -114,7 +114,7 @@ export function SubscriptionsTable() {
                 <TableCell>{subscription.name}</TableCell>
                 <TableCell>{`${subscription.firstName} ${subscription.lastName}`}</TableCell>
                 <TableCell>${subscription.amount.toFixed(2)}</TableCell>
-                <TableCell>{new Date(subscription.createTimeStampUTC).toLocaleDateString()}</TableCell>
+                <TableCell>{subscription.createTimeStampUTC}</TableCell>
                 <TableCell>{subscription.pastOccurrences} / {subscription.totalOccurrences}</TableCell>
                 <TableCell>
                   <span
