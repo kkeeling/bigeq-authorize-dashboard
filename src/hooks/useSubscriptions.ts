@@ -7,6 +7,6 @@ export const useSubscriptions = () => {
     queryKey: ['subscriptions'],
     queryFn: getSubscriptions,
     staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
-    retry: 2
+    retry: 0
   })
 } 

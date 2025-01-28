@@ -8,13 +8,13 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 })
+api.defaults.withCredentials = true;
 
 export const getSubscriptions = async () => {
   try {
-    const response = await api.post('/authorize/subscriptions/')
-
+    const response = await api.get('/authorize/subscriptions/')
     const subscriptions = z.array(SubscriptionSchema).parse(
-      response.data.subscriptionDetails
+      response.data
     )
 
     return subscriptions

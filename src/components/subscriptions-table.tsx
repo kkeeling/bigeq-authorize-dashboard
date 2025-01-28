@@ -94,7 +94,7 @@ export function SubscriptionsTable() {
               <TableRow key={subscription.id}>
                 <TableCell>{subscription.id}</TableCell>
                 <TableCell>{subscription.name}</TableCell>
-                <TableCell>${subscription.amount.toFixed(2)}</TableCell>
+                <TableCell>{subscription.customerProfileId}</TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
