@@ -76,8 +76,8 @@ export function SubscriptionsTable() {
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => toggleSort("amount")} className="flex items-center gap-1">
-                  Amount
+                <Button variant="ghost" onClick={() => toggleSort("customerProfileId")} className="flex items-center gap-1">
+                  Customer Profile ID
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
