@@ -13,27 +13,42 @@ export function SubscriptionsTable() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialPage = parseInt(searchParams.get('page') || '1', 10);
   const initialPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+  const initialStatus = (searchParams.get('status') || 'active') as 'active' | 'inactive';
 
   const [page, setPage] = useState<number>(initialPage);
   const [pageLimit, setPageLimit] = useState<number>(initialPageLimit);
+  const [status, setStatus] = useState<'active' | 'inactive'>(initialStatus);
   const [sortBy, setSortBy] = useState<keyof Subscription>("id")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [totalSubscriptions, setTotalSubscriptions] = useState<number>(0)
 
-  const { data: subscriptionsData, isLoading, isFetching, error } = useSubscriptions(page, pageLimit)
+  const { data: subscriptionsData, isLoading, isFetching, error } = useSubscriptions(page, pageLimit, status)
   const subscriptions = subscriptionsData?.data || []
-  const totalItems = subscriptionsData?.total || 0
-  const totalPages = Math.ceil(totalItems / pageLimit)
+  const totalPages = Math.ceil(totalSubscriptions / pageLimit)
+
+  // Update total subscriptions count only when we receive it from page 1
+  useEffect(() => {
+    if (page === 1 && subscriptionsData?.total !== undefined) {
+      setTotalSubscriptions(subscriptionsData.total)
+    }
+  }, [page, subscriptionsData?.total])
 
   useEffect(() => {
-    setSearchParams({ page: page.toString(), page_limit: pageLimit.toString() });
+    setSearchParams({
+      page: page.toString(),
+      page_limit: pageLimit.toString(),
+      status: status
+    });
   }, [page, pageLimit, setSearchParams]);
 
   useEffect(() => {
     const newPage = parseInt(searchParams.get('page') || '1', 10);
     const newPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+    const newStatus = (searchParams.get('status') || 'active') as 'active' | 'inactive';
 
     if (page !== newPage) setPage(newPage);
     if (pageLimit !== newPageLimit) setPageLimit(newPageLimit);
+    if (status !== newStatus) setStatus(newStatus);
   }, [searchParams]);
 
   useEffect(() => {
@@ -85,8 +100,30 @@ export function SubscriptionsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Subscriptions</CardTitle>
-        <CardDescription>Monitor active subscriptions and recurring payments</CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Subscriptions</CardTitle>
+            <CardDescription>Monitor subscriptions and recurring payments</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-md shadow-sm" role="group">
+              <Button
+                variant={status === 'active' ? 'default' : 'outline'}
+                onClick={() => setStatus('active')}
+                className="rounded-r-none"
+              >
+                Active
+              </Button>
+              <Button
+                variant={status === 'inactive' ? 'default' : 'outline'}
+                onClick={() => setStatus('inactive')}
+                className="rounded-l-none"
+              >
+                Inactive
+              </Button>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
@@ -200,4 +237,3 @@ export function SubscriptionsTable() {
     </Card>
   )
 }
-

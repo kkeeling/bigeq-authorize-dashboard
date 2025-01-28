@@ -10,10 +10,10 @@ const api = axios.create({
 })
 api.defaults.withCredentials = true;
 
-export const getSubscriptions = async (page = 1, page_limit = 10) => {
+export const getSubscriptions = async (page = 1, page_limit = 10, status?: 'active' | 'inactive') => {
   try {
     const response = await api.get('/authorize/subscriptions/', {
-      params: { page, page_limit },
+      params: { page, page_limit, status },
     })
     const paginatedSubscriptions = PaginatedSubscriptionsSchema.parse(response.data)
     return paginatedSubscriptions
@@ -23,4 +23,4 @@ export const getSubscriptions = async (page = 1, page_limit = 10) => {
     }
     throw error
   }
-} 
+}

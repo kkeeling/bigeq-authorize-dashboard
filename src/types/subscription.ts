@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const SubscriptionSchema = z.object({
   id: z.string(),
   name: z.string(),
-  status: z.enum(['active', 'suspended', 'cancelled']),
+  status: z.enum(['active', 'expired', 'suspended', 'cancelled', 'terminated']),
   customerProfileId: z.string(),
   createTimeStampUTC: z.string(),
   firstName: z.string(),
