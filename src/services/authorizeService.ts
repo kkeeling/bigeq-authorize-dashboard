@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { SubscriptionSchema } from '@/types/subscription'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_AUTHORIZE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -11,17 +11,7 @@ const api = axios.create({
 
 export const getSubscriptions = async () => {
   try {
-    const response = await api.post('/ARBGetSubscriptionListRequest', {
-      merchantAuthentication: {
-        name: import.meta.env.VITE_AUTHORIZE_API_LOGIN_ID,
-        transactionKey: import.meta.env.VITE_AUTHORIZE_TRANSACTION_KEY
-      },
-      searchType: 'subscriptionActive',
-      sorting: {
-        orderBy: 'createTimeStampUTC',
-        orderDescending: true
-      }
-    })
+    const response = await api.post('/authorize/subscriptions/')
 
     const subscriptions = z.array(SubscriptionSchema).parse(
       response.data.subscriptionDetails
