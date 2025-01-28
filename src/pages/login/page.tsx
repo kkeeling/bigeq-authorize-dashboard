@@ -20,7 +20,7 @@ export default function LoginPage() {
       // TODO: Implement actual authentication
       if (username === "admin" && password === "password") {
         localStorage.setItem("isAuthenticated", "true")
-        navigate("/dashboard")
+        navigate("/")
       } else {
         setError("Invalid username or password")
       }

@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import HomePage from "./pages/page"
 import DashboardPage from "./pages/dashboard/page"
 import LoginPage from "./pages/login/page"
 
@@ -19,16 +18,15 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-background">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoute>
                 <DashboardPage />
               </ProtectedRoute>
             }
           />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
     </BrowserRouter>
