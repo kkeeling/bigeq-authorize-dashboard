@@ -1,48 +1,87 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
-
-type Subscription = {
-  id: string
-  plan: string
-  price: number
-  status: string
-  nextBilling: string
-}
-
-const data: Subscription[] = [
-  {
-    id: "1",
-    plan: "Premium Plan",
-    price: 29.99,
-    status: "Active",
-    nextBilling: "2024-02-15",
-  },
-  {
-    id: "2",
-    plan: "Basic Plan",
-    price: 9.99,
-    status: "Active",
-    nextBilling: "2024-02-14",
-  },
-  {
-    id: "3",
-    plan: "Pro Plan",
-    price: 49.99,
-    status: "Cancelled",
-    nextBilling: "2024-02-01",
-  },
-]
+import { useSubscriptions } from "@/hooks/useSubscriptions"
+import type { Subscription } from "@/types/subscription"
 
 export function SubscriptionsTable() {
-  const [sortBy, setSortBy] = useState<keyof Subscription>("plan")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPage = parseInt(searchParams.get('page') || '1', 10);
+  const initialPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+  const initialStatus = (searchParams.get('status') || 'active') as 'active' | 'inactive';
 
-  const sortedData = [...data].sort((a, b) => {
+  const [page, setPage] = useState<number>(initialPage);
+  const [pageLimit, setPageLimit] = useState<number>(initialPageLimit);
+  const [status, setStatus] = useState<'active' | 'inactive'>(initialStatus);
+  const [sortBy, setSortBy] = useState<keyof Subscription>("id")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const [totalSubscriptions, setTotalSubscriptions] = useState<number>(0)
+
+  const { data: subscriptionsData, isLoading, isFetching, error } = useSubscriptions(page, pageLimit, status)
+  const subscriptions = subscriptionsData?.data || []
+  const totalPages = Math.ceil(totalSubscriptions / pageLimit)
+
+  // Update total subscriptions count only when we receive it from page 1
+  useEffect(() => {
+    if (page === 1 && subscriptionsData?.total !== undefined) {
+      setTotalSubscriptions(subscriptionsData.total)
+    }
+  }, [page, subscriptionsData?.total])
+
+  useEffect(() => {
+    setSearchParams({
+      page: page.toString(),
+      page_limit: pageLimit.toString(),
+      status: status
+    });
+  }, [page, pageLimit, setSearchParams]);
+
+  useEffect(() => {
+    const newPage = parseInt(searchParams.get('page') || '1', 10);
+    const newPageLimit = parseInt(searchParams.get('page_limit') || '10', 10);
+    const newStatus = (searchParams.get('status') || 'active') as 'active' | 'inactive';
+
+    if (page !== newPage) setPage(newPage);
+    if (pageLimit !== newPageLimit) setPageLimit(newPageLimit);
+    if (status !== newStatus) setStatus(newStatus);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [totalPages, page]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscriptions</CardTitle>
+          <CardDescription>Loading subscription data...</CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Error</CardTitle>
+          <CardDescription className="text-destructive">
+            Failed to load subscriptions: {error.message}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    )
+  }
+
+  const sortedData = [...(subscriptions || [])].sort((a, b) => {
     if (sortOrder === "asc") {
       return a[sortBy] < b[sortBy] ? -1 : 1
     }
@@ -61,22 +100,68 @@ export function SubscriptionsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Subscriptions</CardTitle>
-        <CardDescription>Monitor active subscriptions and recurring payments</CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Subscriptions</CardTitle>
+            <CardDescription>Monitor subscriptions and recurring payments</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-md shadow-sm" role="group">
+              <Button
+                variant={status === 'active' ? 'default' : 'outline'}
+                onClick={() => setStatus('active')}
+                className="rounded-r-none"
+              >
+                Active
+              </Button>
+              <Button
+                variant={status === 'inactive' ? 'default' : 'outline'}
+                onClick={() => setStatus('inactive')}
+                className="rounded-l-none"
+              >
+                Inactive
+              </Button>
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>
-                <Button variant="ghost" onClick={() => toggleSort("plan")} className="flex items-center gap-1">
-                  Plan
+                <Button variant="ghost" onClick={() => toggleSort("id")} className="flex items-center gap-1">
+                  ID
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => toggleSort("price")} className="flex items-center gap-1">
-                  Price
+                <Button variant="ghost" onClick={() => toggleSort("name")} className="flex items-center gap-1">
+                  Name
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("firstName")} className="flex items-center gap-1">
+                  Customer Name
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("amount")} className="flex items-center gap-1">
+                  Amount
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("createTimeStampUTC")} className="flex items-center gap-1">
+                  Created
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("pastOccurrences")} className="flex items-center gap-1">
+                  Payments Made
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
@@ -86,23 +171,21 @@ export function SubscriptionsTable() {
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
-              <TableHead>
-                <Button variant="ghost" onClick={() => toggleSort("nextBilling")} className="flex items-center gap-1">
-                  Next Billing
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedData.map((subscription) => (
               <TableRow key={subscription.id}>
-                <TableCell>{subscription.plan}</TableCell>
-                <TableCell>${subscription.price.toFixed(2)}</TableCell>
+                <TableCell>{subscription.id}</TableCell>
+                <TableCell>{subscription.name}</TableCell>
+                <TableCell>{`${subscription.firstName} ${subscription.lastName}`}</TableCell>
+                <TableCell>${subscription.amount.toFixed(2)}</TableCell>
+                <TableCell>{subscription.createTimeStampUTC}</TableCell>
+                <TableCell>{subscription.pastOccurrences} / {subscription.totalOccurrences}</TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      subscription.status === "Active"
+                      subscription.status === "active"
                         ? "bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20"
                         : "bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20"
                     }`}
@@ -110,13 +193,47 @@ export function SubscriptionsTable() {
                     {subscription.status}
                   </span>
                 </TableCell>
-                <TableCell>{subscription.nextBilling}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
+      <CardFooter>
+        <div className="flex items-center justify-between w-full">
+          <Button
+            variant="outline"
+            onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            aria-label="Go to previous page"
+          >
+            Previous
+          </Button>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            aria-label="Go to next page"
+          >
+            Next
+          </Button>
+          <div>
+            <label htmlFor="pageLimit" className="mr-2">Items per page:</label>
+            <select
+              id="pageLimit"
+              value={pageLimit}
+              onChange={(e) => setPageLimit(Number(e.target.value))}
+              className="border rounded p-1"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+      </CardFooter>
     </Card>
   )
 }
-
