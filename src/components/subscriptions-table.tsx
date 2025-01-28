@@ -76,8 +76,26 @@ export function SubscriptionsTable() {
                 </Button>
               </TableHead>
               <TableHead>
-                <Button variant="ghost" onClick={() => toggleSort("customerProfileId")} className="flex items-center gap-1">
-                  Customer Profile ID
+                <Button variant="ghost" onClick={() => toggleSort("firstName")} className="flex items-center gap-1">
+                  Customer Name
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("amount")} className="flex items-center gap-1">
+                  Amount
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("createTimeStampUTC")} className="flex items-center gap-1">
+                  Created
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => toggleSort("pastOccurrences")} className="flex items-center gap-1">
+                  Payments Made
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
@@ -94,7 +112,10 @@ export function SubscriptionsTable() {
               <TableRow key={subscription.id}>
                 <TableCell>{subscription.id}</TableCell>
                 <TableCell>{subscription.name}</TableCell>
-                <TableCell>{subscription.customerProfileId}</TableCell>
+                <TableCell>{`${subscription.firstName} ${subscription.lastName}`}</TableCell>
+                <TableCell>${subscription.amount.toFixed(2)}</TableCell>
+                <TableCell>{new Date(subscription.createTimeStampUTC).toLocaleDateString()}</TableCell>
+                <TableCell>{subscription.pastOccurrences} / {subscription.totalOccurrences}</TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
