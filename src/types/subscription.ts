@@ -53,7 +53,7 @@ export const SubscriptionDetailSchema = z.object({
   trialAmount: z.number(),
   status: z.enum(['active', 'expired', 'suspended', 'cancelled', 'terminated']),
   profile: ProfileSchema,
-  arbTransactions: z.array(ArbTransactionSchema)
+  arbTransactions: z.array(ArbTransactionSchema).optional()
 })
 
 export type SubscriptionDetail = z.infer<typeof SubscriptionDetailSchema>
