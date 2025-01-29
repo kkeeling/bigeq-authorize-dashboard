@@ -137,7 +137,8 @@ export function SubscriptionDetailModal({
           <CardContent className="pt-6">
             <h4 className="text-sm font-semibold mb-4">ARB Transactions</h4>
             <div className="space-y-4">
-              {subscription.arbTransactions.map((transaction, index) => (
+              {subscription.arbTransactions?.length ? (
+                subscription.arbTransactions.map((transaction, index) => (
                 <div key={index} className="grid grid-cols-2 gap-4 border-b pb-4 last:border-b-0">
                   {transaction.transId && (
                     <div>
@@ -166,8 +167,11 @@ export function SubscriptionDetailModal({
                     <p>{transaction.attemptNum}</p>
                   </div>
                 </div>
-              ))}
-              </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No transactions found</p>
+              )}
+            </div>
             </CardContent>
           </Card>
       </div>
