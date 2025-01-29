@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { z } from 'zod'
-import { PaginatedSubscriptionsSchema } from '@/types/subscription'
+import { PaginatedSubscriptionsSchema, SubscriptionDetailSchema } from '@/types/subscription'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -20,6 +20,19 @@ export const getSubscriptions = async (page = 1, page_limit = 10, status?: 'acti
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(`Failed to fetch subscriptions: ${error.message}`)
+    }
+    throw error
+  }
+}
+
+export const getSubscriptionDetail = async (subscriptionId: string) => {
+  try {
+    const response = await api.get(`/authorize/subscription/${subscriptionId}/`)
+    const subscriptionDetail = SubscriptionDetailSchema.parse(response.data.subscription)
+    return subscriptionDetail
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(`Failed to fetch subscription details: ${error.message}`)
     }
     throw error
   }

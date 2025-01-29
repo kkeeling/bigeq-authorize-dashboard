@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useSearchParams } from "react-router-dom"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowUpDown, ChevronRight } from "lucide-react"
 import { useSubscriptions } from "@/hooks/useSubscriptions"
 import type { Subscription } from "@/types/subscription"
+import { SubscriptionDetailModal } from "./subscription-detail-modal"
 
 export function SubscriptionsTable() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +22,8 @@ export function SubscriptionsTable() {
   const [sortBy, setSortBy] = useState<keyof Subscription>("id")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [totalSubscriptions, setTotalSubscriptions] = useState<number>(0)
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const { data: subscriptionsData, isLoading, isFetching, error } = useSubscriptions(page, pageLimit, status)
   const subscriptions = subscriptionsData?.data || []
@@ -175,7 +178,24 @@ export function SubscriptionsTable() {
           </TableHeader>
           <TableBody>
             {sortedData.map((subscription) => (
-              <TableRow key={subscription.id}>
+              <TableRow 
+                key={subscription.id}
+                className="cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                  setSelectedSubscriptionId(subscription.id)
+                  setIsModalOpen(true)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelectedSubscriptionId(subscription.id)
+                    setIsModalOpen(true)
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`View details for subscription ${subscription.name}`}
+              >
                 <TableCell>{subscription.id}</TableCell>
                 <TableCell>{subscription.name}</TableCell>
                 <TableCell>{`${subscription.firstName} ${subscription.lastName}`}</TableCell>
@@ -193,11 +213,22 @@ export function SubscriptionsTable() {
                     {subscription.status}
                   </span>
                 </TableCell>
+                <TableCell>
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
+      <SubscriptionDetailModal
+        subscriptionId={selectedSubscriptionId}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedSubscriptionId(null)
+        }}
+      />
       <CardFooter>
         <div className="flex items-center justify-between w-full">
           <Button
