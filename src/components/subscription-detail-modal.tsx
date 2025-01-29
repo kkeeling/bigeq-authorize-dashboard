@@ -58,39 +58,35 @@ export function SubscriptionDetailModal({
           </Badge>
         </div>
 
-        {/* Customer Information */}
+        {/* Customer and Payment Profile Information */}
         <Card>
           <CardContent className="pt-6">
             <h4 className="text-sm font-semibold mb-4">Customer Information</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Name</p>
-                <p>{`${subscription.firstName} ${subscription.lastName}`}</p>
+                <p>{`${subscription.profile.paymentProfile.billTo.firstName} ${subscription.profile.paymentProfile.billTo.lastName}`}</p>
               </div>
-              {subscription.email && (
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p>{subscription.email}</p>
-                </div>
-              )}
-              {subscription.phone && (
-                <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p>{subscription.phone}</p>
-                </div>
-              )}
-              {subscription.address && (
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Address</p>
-                  <p>
-                    {subscription.address.line1}
-                    {subscription.address.line2 && <>, {subscription.address.line2}</>}
-                    <br />
-                    {subscription.address.city}, {subscription.address.state} {subscription.address.zip}
-                    {subscription.address.country && <>, {subscription.address.country}</>}
-                  </p>
-                </div>
-              )}
+              <div>
+                <p className="text-sm text-gray-500">Customer Type</p>
+                <p>{subscription.profile.paymentProfile.customerType}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm text-gray-500">Address</p>
+                <p>
+                  {subscription.profile.paymentProfile.billTo.address}<br />
+                  {subscription.profile.paymentProfile.billTo.city}, {subscription.profile.paymentProfile.billTo.state} {subscription.profile.paymentProfile.billTo.zip}<br />
+                  {subscription.profile.paymentProfile.billTo.country}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Customer Profile ID</p>
+                <p>{subscription.profile.customerProfileId}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Payment Profile ID</p>
+                <p>{subscription.profile.paymentProfile.customerPaymentProfileId}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -101,53 +97,76 @@ export function SubscriptionDetailModal({
             <h4 className="text-sm font-semibold mb-4">Payment Information</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
+                <p className="text-sm text-gray-500">Card Number</p>
+                <p>{subscription.profile.paymentProfile.payment.creditCard.cardNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Expiration Date</p>
+                <p>{subscription.profile.paymentProfile.payment.creditCard.expirationDate}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-500">Amount</p>
                 <p>${subscription.amount.toFixed(2)}</p>
               </div>
               <div>
+                <p className="text-sm text-gray-500">Trial Amount</p>
+                <p>${subscription.trialAmount.toFixed(2)}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-500">Billing Frequency</p>
-                <p>Every {subscription.paymentSchedule.intervalLength} {subscription.paymentSchedule.interval}</p>
+                <p>Every {subscription.paymentSchedule.interval.length} {subscription.paymentSchedule.interval.unit}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Start Date</p>
                 <p>{formatDate(subscription.paymentSchedule.startDate)}</p>
               </div>
-              {subscription.paymentSchedule.nextBillingDate && (
-                <div>
-                  <p className="text-sm text-gray-500">Next Billing Date</p>
-                  <p>{formatDate(subscription.paymentSchedule.nextBillingDate)}</p>
-                </div>
-              )}
               <div>
-                <p className="text-sm text-gray-500">Payments Made</p>
-                <p>{subscription.pastOccurrences} of {subscription.totalOccurrences}</p>
+                <p className="text-sm text-gray-500">Total Occurrences</p>
+                <p>{subscription.paymentSchedule.totalOccurrences}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Trial Occurrences</p>
+                <p>{subscription.paymentSchedule.trialOccurrences}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Transaction History */}
-        {subscription.lastTransactionDate && (
-          <Card>
-            <CardContent className="pt-6">
-              <h4 className="text-sm font-semibold mb-4">Last Transaction</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Date</p>
-                  <p>{formatDate(subscription.lastTransactionDate)}</p>
+        <Card>
+          <CardContent className="pt-6">
+            <h4 className="text-sm font-semibold mb-4">ARB Transactions</h4>
+            <div className="space-y-4">
+              {subscription.arbTransactions.map((transaction, index) => (
+                <div key={index} className="grid grid-cols-2 gap-4 border-b pb-4 last:border-b-0">
+                  {transaction.transId && (
+                    <div>
+                      <p className="text-sm text-gray-500">Transaction ID</p>
+                      <p>{transaction.transId}</p>
+                    </div>
+                  )}
+                  {transaction.response && (
+                    <div>
+                      <p className="text-sm text-gray-500">Response</p>
+                      <p>{transaction.response}</p>
+                    </div>
+                  )}
+                  {transaction.submitTimeUTC && (
+                    <div>
+                      <p className="text-sm text-gray-500">Submit Time</p>
+                      <p>{formatDate(transaction.submitTimeUTC)}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-500">Payment Number</p>
+                    <p>{transaction.payNum}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Attempt Number</p>
+                    <p>{transaction.attemptNum}</p>
+                  </div>
                 </div>
-                {subscription.lastTransactionId && (
-                  <div>
-                    <p className="text-sm text-gray-500">Transaction ID</p>
-                    <p>{subscription.lastTransactionId}</p>
-                  </div>
-                )}
-                {subscription.lastTransactionStatus && (
-                  <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <p>{subscription.lastTransactionStatus}</p>
-                  </div>
-                )}
+              ))}
               </div>
             </CardContent>
           </Card>
