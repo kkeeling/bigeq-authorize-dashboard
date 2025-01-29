@@ -49,7 +49,7 @@ export function SubscriptionDetailModal({
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-semibold">{subscription.name}</h3>
-            <p className="text-sm text-gray-500">ID: {subscription.id}</p>
+            <p className="text-sm text-gray-500">ID: {subscriptionId}</p>
           </div>
           <Badge
             className={subscription.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
@@ -170,7 +170,6 @@ export function SubscriptionDetailModal({
               </div>
             </CardContent>
           </Card>
-        )}
       </div>
     )
   }
